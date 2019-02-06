@@ -75,6 +75,13 @@ def isFree(people):
     return True
 
 
+def galeShapley(knights, ladies):
+    knightsList = knights.keys()
+    ladiesList = ladies.keys()
+    knightsValues = knights.values()
+    #print(knightsValues)
+    knightsMatchedList = {}
+    ladiesMatchedList = {}
 
     for knight in knightsList:
         tempDict = {knight : 0}
