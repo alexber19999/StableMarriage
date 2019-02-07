@@ -12,7 +12,7 @@ def openFile():
         return dataFile
     except IOError:
         print("Invalid File Name")
-        return 0
+
 
 
 def parseFile(file):
@@ -70,7 +70,7 @@ def parseF():
 
 def isFree(people):
     for person in people:
-        if people.pop(person[0]) == 0:
+        if people.get(person) == 0:
             return False
     return True
 
@@ -92,6 +92,7 @@ def galeShapley(knights, ladies):
     #possible invariant: knightsMatchedList keys(knights)
     #are in the same order as the knights in the dictionary passed in
     while(isFree(knightsMatchedList)):
+        knightsMatchedListList = list(knightsMatchedList)
         m = knightsMatchedList.popitem()
         mPref = knights.popitem()
         preferenceList = mPref[1]
@@ -103,20 +104,24 @@ def galeShapley(knights, ladies):
                     knightsMatchedList.update(fiances)
                     ladiesMatchedList.update(lady, m[0])
         else:
-            prefLadyList = knights.get(m[1])
+            #prefLadyList = knights.get(m[1])
             #mprime = prefLadyList[]
-
-
+            mprime = knightsMatchedListList.index(mPref)
+            if ladies[mPref][knightsMatchedListList.index(m[0])] < ladies[mPref][mprime]:
+                ladiesMatchedList.update(knightsMatchedListList.index(mPref))
+                knightsMatchedList.update(mprime, 0)
+            else:
+                knightsMatchedList.update(knightsMatchedListList.index(m[0]))
         #put knight back in dictionary
         knights.update(mPref)
 
 
 
-    return
+    return knightsMatchedList
 
 
 def main():
     knights, ladies = parseF()
-    galeShapley(knights, ladies)
-
+    knights = galeShapley(knights, ladies)
+    print(knights)
 main()
