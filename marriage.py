@@ -1,7 +1,7 @@
 import sys
 import copy
-
 #!/usr/bin/python3
+
 def openFile():
     if(len(sys.argv) != 1):
         sys.exit(1)
@@ -13,31 +13,6 @@ def openFile():
     except IOError:
         print("Invalid File Name")
 
-
-
-def parseFile(file):
-    dataFile = openFile()
-    c = dataFile.read(1)
-    n = c
-    counter = 1
-    knightCounter = 0
-    knights = {}
-    ladies = {}
-    knightPrefs = []
-    ladiesPrefs = []
-
-
-    while c and counter != ((2 * n * (n + 1)) / 2) + 1:
-        counter += 1
-        c = dataFile.read(1)
-        #store knights
-
-        if(c == '\n'):
-            knightCounter += 1
-
-    while c and counter != 2 * n * (n + 1) + 1:
-        counter += 1
-        #store ladies
 
 
 def parseF():
@@ -71,8 +46,8 @@ def parseF():
 def isFree(people):
     for person in people:
         if people.get(person) == 0:
-            return False
-    return True
+            return True
+    return False
 
 
 def galeShapley(knights, ladies):
@@ -83,12 +58,14 @@ def galeShapley(knights, ladies):
     knightsMatchedList = {}
     ladiesMatchedList = {}
 
+    M = []
     for knight in knightsList:
         tempDict = {knight : 0}
         knightsMatchedList.update(tempDict)
     for lady in ladiesList:
         tempDict = {lady : 0}
         ladiesMatchedList.update(tempDict)
+
     #possible invariant: knightsMatchedList keys(knights)
     #are in the same order as the knights in the dictionary passed in
     while(isFree(knightsMatchedList)):
@@ -100,28 +77,34 @@ def galeShapley(knights, ladies):
             #get a lady, the highest lady that has not been proposed to
             for lady in preferenceList:
                 if ladiesMatchedList.get(lady) == 0:
+                    #add unordered map
                     fiances = {m[0] : lady}
+                    match = m[0], lady
+                    M.append(match)
+                    print(match)
                     knightsMatchedList.update(fiances)
-                    ladiesMatchedList.update(lady, m[0])
+                    #ladiesMatchedList.update({lady, m[0]})
         else:
             #prefLadyList = knights.get(m[1])
             #mprime = prefLadyList[]
             mprime = knightsMatchedListList.index(mPref)
             if ladies[mPref][knightsMatchedListList.index(m[0])] < ladies[mPref][mprime]:
-                ladiesMatchedList.update(knightsMatchedListList.index(mPref))
-                knightsMatchedList.update(mprime, 0)
+                ladiesMatchedList.update({knightsMatchedListList.index(mPref)})
+                knightsMatchedList.update({mprime, 0})
+                M.remove(mprime)
+                match = ladies[mPref][knightsMatchedListList.index(m[0])] , ladies[mPref]
+                M.append(match)
+
             else:
                 knightsMatchedList.update(knightsMatchedListList.index(m[0]))
         #put knight back in dictionary
         knights.update(mPref)
-
-
-
-    return knightsMatchedList
+    return M
 
 
 def main():
     knights, ladies = parseF()
     knights = galeShapley(knights, ladies)
-    print(knights)
+    #print()
+    #print(knights)
 main()
