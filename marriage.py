@@ -40,71 +40,79 @@ def parseF():
         counter += 1
     dataFile.close()
 
-    return knights, ladies
+    return knights, ladies, numNights
 
 
 def isFree(people):
     for person in people:
-        if people.get(person) == 0:
+        if people[person][0] == 0:
             return True
     return False
 
 
-def galeShapley(knights, ladies):
-    knightsList = knights.keys()
-    ladiesList = ladies.keys()
-    knightsValues = knights.values()
+
+
+
+def galeShapley(knights, ladies, numNights):
+
+    knightsList = list(knights.keys())
+    ladiesList = list(ladies.keys())
     #print(knightsValues)
     knightsMatchedList = {}
     ladiesMatchedList = {}
 
-    M = []
+    M = {}
     for knight in knightsList:
-        tempDict = {knight : 0}
+        tempDict = {knight : [0, -1]}
         knightsMatchedList.update(tempDict)
     for lady in ladiesList:
-        tempDict = {lady : 0}
+        tempDict = {lady : [0, ladies[lady][0]]}
         ladiesMatchedList.update(tempDict)
 
     #possible invariant: knightsMatchedList keys(knights)
     #are in the same order as the knights in the dictionary passed in
-    while(isFree(knightsMatchedList)):
-        knightsMatchedListList = list(knightsMatchedList)
-        m = knightsMatchedList.popitem()
-        mPref = knights.popitem()
-        preferenceList = mPref[1]
-        if m[1] == 0:
-            #get a lady, the highest lady that has not been proposed to
-            for lady in preferenceList:
-                if ladiesMatchedList.get(lady) == 0:
-                    #add unordered map
-                    fiances = {m[0] : lady}
-                    match = m[0], lady
-                    M.append(match)
-                    print(match)
-                    knightsMatchedList.update(fiances)
-                    #ladiesMatchedList.update({lady, m[0]})
-        else:
-            #prefLadyList = knights.get(m[1])
-            #mprime = prefLadyList[]
-            mprime = knightsMatchedListList.index(mPref)
-            if ladies[mPref][knightsMatchedListList.index(m[0])] < ladies[mPref][mprime]:
-                ladiesMatchedList.update({knightsMatchedListList.index(mPref)})
-                knightsMatchedList.update({mprime, 0})
-                M.remove(mprime)
-                match = ladies[mPref][knightsMatchedListList.index(m[0])] , ladies[mPref]
-                M.append(match)
 
-            else:
-                knightsMatchedList.update(knightsMatchedListList.index(m[0]))
-        #put knight back in dictionary
-        knights.update(mPref)
+    while isFree(knightsMatchedList):
+        for m in knightsList:
+            #get single dictionary entry for the knight m
+            #knightIndex = knightsList.index(m)
+            #tempDict = dict.fromkeys(knightsMatchedList[knightIndex])
+
+            #get the first lady that the knight m has not proposed to
+            ladyIndex = knightsMatchedList[m][0]
+            ladyName = ladiesList[ladyIndex]
+
+            #finding if firstLady is free(0 for free, otherwise not free)
+            firstLadyFree = ladiesMatchedList[ladyName][0]
+            #getting the name of the first lady not proposed to
+
+            if not firstLadyFree:
+                #add to the matched list
+                M[ladyName] = m
+                #add to the ladiesMatchedList
+                ladiesMatchedList[ladyName][0] = 1
+                #add to the knightsMatchedList
+                knightsMatchedList[m][0] = 1
+                # increment ladyFreeIndex
+                knightsMatchedList[m][1] += 1
+            elif ladies[ladyName].index(M[ladyName]) < ladies[ladyName].index(m):
+                #remove current from MatchedList
+                v = M.pop(ladyName)
+                #add the preferred to MatchList
+                M[ladyName] = m
+                knightsMatchedList[m][0] = 0
+
     return M
 
 
+
+
+
+
+
+
 def main():
-    knights, ladies = parseF()
-    knights = galeShapley(knights, ladies)
-    #print()
-    #print(knights)
+    knights, ladies, numNights = parseF()
+    knights = galeShapley(knights, ladies, numNights)
+    print(knights)
 main()
