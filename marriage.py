@@ -40,7 +40,7 @@ def parseF():
         counter += 1
     dataFile.close()
 
-    return knights, ladies, numNights
+    return knights, ladies, numKnights
 
 
 def isFree(people):
@@ -53,7 +53,7 @@ def isFree(people):
 
 
 
-def galeShapley(knights, ladies, numNights):
+def galeShapley(knights, ladies, numKnights):
 
     knightsList = list(knights.keys())
     ladiesList = list(ladies.keys())
@@ -69,30 +69,32 @@ def galeShapley(knights, ladies, numNights):
         tempDict = {lady : [0, ladies[lady][0]]}
         ladiesMatchedList.update(tempDict)
 
+    print(knightsMatchedList)
+    print(ladiesMatchedList)
     #possible invariant: knightsMatchedList keys(knights)
     #are in the same order as the knights in the dictionary passed in
 
-    while isFree(knightsMatchedList):
+    while len(M) != numKnights:
         for m in knightsList:
             #get single dictionary entry for the knight m
             #knightIndex = knightsList.index(m)
             #tempDict = dict.fromkeys(knightsMatchedList[knightIndex])
 
             #get the first lady that the knight m has not proposed to
-            ladyIndex = knightsMatchedList[m][0]
+            ladyIndex = knightsMatchedList[m][1] + 1
             ladyName = ladiesList[ladyIndex]
 
             #finding if firstLady is free(0 for free, otherwise not free)
-            firstLadyFree = ladiesMatchedList[ladyName][0]
+            #firstLadyFree = knightsMatchedList[m][0]
             #getting the name of the first lady not proposed to
 
-            if not firstLadyFree:
+            if ladiesMatchedList[ladyName][0] == 0:
                 #add to the matched list
                 M[ladyName] = m
                 #add to the ladiesMatchedList
                 ladiesMatchedList[ladyName][0] = 1
                 #add to the knightsMatchedList
-                knightsMatchedList[m][0] = 1
+                #knightsMatchedList[m][0] = 1
                 # increment ladyFreeIndex
                 knightsMatchedList[m][1] += 1
             elif ladies[ladyName].index(M[ladyName]) < ladies[ladyName].index(m):
@@ -100,7 +102,8 @@ def galeShapley(knights, ladies, numNights):
                 v = M.pop(ladyName)
                 #add the preferred to MatchList
                 M[ladyName] = m
-                knightsMatchedList[m][0] = 0
+                #knightsMatchedList[m][0] = 0
+
 
     return M
 
@@ -112,7 +115,7 @@ def galeShapley(knights, ladies, numNights):
 
 
 def main():
-    knights, ladies, numNights = parseF()
-    knights = galeShapley(knights, ladies, numNights)
+    knights, ladies, numKnights = parseF()
+    knights = galeShapley(knights, ladies, numKnights)
     print(knights)
 main()
